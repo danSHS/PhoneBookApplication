@@ -143,5 +143,82 @@ public:
 			current = current->next;
 		}
 	}
+	void retrieveByLastName(const std::string& specificLastName) const {
+	Phonerecord* current = head;
+	bool found = false;
+
+	while (current != nullptr) {
+		if (current->lastName == specificLastName) {
+			std::cout << "Name: " << current->lastName << ", " << current->firstName << " - Phone Number: " << current->phoneNumber << std::endl;
+			found = true;
+		}
+		current = current->next;
+	}
+	if (!found) {
+		std::cout << "No records found for last name: " << specificLastName << std::endl;
+	}
+}
+	void deleteByLastName(const std::string& specificLastName) {
+		Phonerecord* current = head;
+		bool found = false;
+
+		while (current != nullptr) {
+			if (current->lastName == specificLastName) {
+				found = true;
+
+				if (current->prev) {
+					current->prev->next = current->next;
+				}
+				else {
+					head = current->next;
+				}
+
+				if (current->next) {
+					current->next->prev = current->prev;
+				}
+				else {
+					tail = current->prev;
+				}
+
+				Phonerecord* temp = current->next;
+				delete current;
+				current = temp;
+			}
+			else {
+				current = current->next;
+			}
+		}
+
+		if (!found) {
+			std::cout << "No records found for last name: " << specificLastName << std::endl;
+		}
+	}
+
+	void loadFromFile(const std::string& filename) {
+		std::ifstream file(filename);
+		std::string line;
+		while (std::getline(file, line)) {
+			std::stringstream linestream(line);
+			std::string lastName, firstName, phoneNumber;
+
+			std::getline(linestream, lastName, ',');
+			std::getline(linestream, firstName, ',');
+			std::getline(linestream, phoneNumber);
+
+			if (!lastName.empty() && !firstName.empty() && !phoneNumber.empty()) {
+				addRecord(lastName, firstName, phoneNumber);
+			}
+		}
+		file.close();
+	}
+	void saveToFile(const std::string& filename) const {
+		std::ofstream file(filename);
+		Phonerecord* current = head;
+		while (current != nullptr) {
+			file << current->lastName << "," << current->firstName << "," << current->phoneNumber << std::endl;
+			current = current->next;
+		}
+		file.close();
+	}
 };
 #endif 
